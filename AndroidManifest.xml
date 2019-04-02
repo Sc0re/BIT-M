@@ -36,7 +36,12 @@
 
         <activity android:name=".PhotoView" />
 
-        <activity android:name=".SegmentationView"/>
+        <activity android:name=".SegmentationView">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

@@ -1,11 +1,12 @@
 package com.example.bitm;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,6 +33,9 @@ public class SegmentationView extends AppCompatActivity {
     private int stateRect = 0;
     private Point rectPoint;
 
+    // For view
+    ProgressDialog dlg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Init the activity and set the layout
@@ -40,11 +44,14 @@ public class SegmentationView extends AppCompatActivity {
 
         // Create a intent to get the photoPath from Main activity
         // TODO fix this
-        Intent returnIntent = new Intent();
+        Intent returnIntent = getIntent();
         String photoPath = returnIntent.getStringExtra("photoPath");
-        
-        // Using for debug
-        photoPath = "/storage/emulated/0/Android/data/com.example.bitm/files/Pictures/cat.jpg";
+
+        if(photoPath == null) {
+            Log.d("[DEBUG]", "Emppty path");
+        }
+
+        dlg = new ProgressDialog(this);
 
         // Start the segApp app
         startSegApp(photoPath);
@@ -109,16 +116,12 @@ public class SegmentationView extends AppCompatActivity {
 
         stateRect = 0;
         pickingRect = true;
+
+        showImageOnScreen();
     }
 
     public void runSegmentation (View view) {
-        segApp.run();
-
-        if(pickingRect)
-            pickingRect = false;
-
-        segApp.cleanViewMat();
-        showImageOnScreen();
+        new ProcessImageTask().execute();
     }
 
     private void cleanCursor() {
@@ -212,7 +215,11 @@ public class SegmentationView extends AppCompatActivity {
         segApp.exportBmpToGallery(this);
     }
 
+
     /*
+    / Background running Segmentation
+    */
+
     private class ProcessImageTask extends AsyncTask<Integer, Integer, Integer> {
 
         @Override
@@ -226,15 +233,7 @@ public class SegmentationView extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Integer... params) {
-
-            if(!targetClose) {
-                gcapp.init(photoMat, segmentRect);
-                gcapp.setRectInMask();
-            }
-
-            gcapp.run();
-
-            photoMat = gcapp.getImg();
+            segApp.run();
 
             return 0;
         }
@@ -243,16 +242,13 @@ public class SegmentationView extends AppCompatActivity {
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
 
-            targetClose = true;
+            if(pickingRect)
+                pickingRect = false;
 
-            bgPoints.clear();
-
-            photoBmp = MatToBmp(photoMat);
-
-            imagePreview.setImageBitmap(photoBmp);
+            segApp.cleanViewMat();
+            showImageOnScreen();
 
             dlg.dismiss();
         }
     }
-    */
 }

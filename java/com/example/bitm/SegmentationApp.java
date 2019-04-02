@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Vector;
 
 public class SegmentationApp {
 
@@ -44,8 +45,8 @@ public class SegmentationApp {
     private Mat fgMat = new Mat();
     private Mat bgMat = new Mat();
 
-    private ArrayList<Point> bgPoints = new ArrayList<>();
-    private ArrayList<Point> fgPoints = new ArrayList<>();
+    private Vector<Point> bgPoints = new Vector<>();
+    private Vector<Point> fgPoints = new Vector<>();
 
     private boolean hasRect = false;
     private boolean hasRectRun = false;
@@ -79,7 +80,7 @@ public class SegmentationApp {
             hasRectRun = true;
         }
         else {
-            Imgproc.grabCut(photoMat, photoMask, segRect, bgMat, fgMat, iteration, Imgproc.GC_INIT_WITH_RECT);
+            Imgproc.grabCut(photoMat, photoMask, segRect, bgMat, fgMat, iteration, Imgproc.GC_INIT_WITH_MASK);
 
             Log.d("[DEBUG]", "Running GC with mask");
         }
@@ -125,7 +126,7 @@ public class SegmentationApp {
         String path = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString();
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "PNG_" + timeStamp + "_";
+        String imageFileName = "EXPORTED_PNG_" + timeStamp + "_";
 
         File file = new File(path, imageFileName+".png");
 
@@ -169,7 +170,7 @@ public class SegmentationApp {
 
         try {
             Imgproc.resize(img, img, new Size(img.width(), img.height()));
-            Imgproc.cvtColor(img, img, Imgproc.COLOR_RGBA2BGRA);
+            //Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2BGR);
 
             bmp = Bitmap.createBitmap(img.cols(), img.rows(), Bitmap.Config.ARGB_8888);
 

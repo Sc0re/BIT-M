@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private String photoPath;
 
     // Using for debug
-    private int stateId = 1;
+    private int stateId = 0;
 
     private int PHOTO_REQUEST = 1;
 
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private void startSegmentation() {
         Intent segmentationIntent = new Intent(this, SegmentationView.class);
 
-        segmentationIntent.putExtra("SegmentationPhotoPath", (String) this.photoPath);
+        segmentationIntent.putExtra("photoPath", this.photoPath);
 
         startActivity(segmentationIntent);
     }
